@@ -1,0 +1,11 @@
+---
+- name: Install Nginx
+  hosts: all
+  remote_user: debian
+  become: true
+  serial: 5
+
+  roles:
+    - chrony
+    - nftables
+    - nginx

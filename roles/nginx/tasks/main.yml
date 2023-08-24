@@ -1,0 +1,40 @@
+---
+- name: Debian OS
+  block:
+
+  # apt install nginx -y
+  - name: Ensure Nginx is at the latest version
+    ansible.builtin.apt:
+      name:
+        - nginx
+      state: latest
+      update_cache: yes
+
+  # systemctl enable nginx --now
+  - name: Start Nginx Service
+    ansible.builtin.systemd:
+      name: nginx
+      state: started
+      enabled: yes
+
+  when: ansible_os_family == "Debian"
+
+- name: Redhat OS
+  block:
+
+  # dnf install chrony -y
+  - name: Ensure Nginx is at the latest version
+    ansible.builtin.yum:
+      name:
+        - nginx
+      state: latest
+      enabled: yes
+
+  # systemctl enable nginx --now
+  - name: Start Nginx Service
+    ansible.builtin.systemd:
+      name: nginx
+      state: started
+      enabled: yes
+
+  when: ansible_os_family == "RedHat"
