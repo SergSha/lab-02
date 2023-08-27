@@ -26,19 +26,18 @@ data "yandex_vpc_address" "addr" {
   address_id = yandex_vpc_network.vpc.id
 }
 
-module "nginxs" {
+module "loadbalancers" {
   source = "./modules/instances"
 
-  count = 1
+  count = 3
 
-  vm_name = "nginx-${count.index + 1}"
+  vm_name = "loadbalancer-${count.index + 1}"
   vpc_name = local.vpc_name
   subnet_cidrs = yandex_vpc_subnet.subnet.v4_cidr_blocks
   subnet_name = yandex_vpc_subnet.subnet.name
   subnet_id = yandex_vpc_subnet.subnet.id
   vm_user = local.vm_user
   ssh_public_key = local.ssh_public_key
-
 }
 
 module "backends" {
@@ -58,9 +57,41 @@ module "backends" {
 resource "local_file" "inventory_file" {
   content = templatefile("${path.module}/templates/inventory.tpl",
     {
-      nginxs = module.nginxs
-      backends   = module.backends
+      loadbalancers = module.loadbalancers
+      backends      = module.backends
     }
   )
-  filename = "./inventory.ini"
+  filename = "${path.module}/inventory.ini"
+}
+
+resource "null_resource" "loadbalancers" {
+
+  count = length(module.loadbalancers)
+
+  # Changes to the instance will cause the null_resource to be re-executed
+  triggers = {
+    name = "${module.loadbalancers[count.index].vm_name}"
+  }
+
+  # Running the remote provisioner like this ensures that ssh is up and running
+  # before running the local provisioner
+
+  provisioner "remote-exec" {
+    inline = ["echo 'Wait until SSH is ready'"]
+  }
+
+  connection {
+    type        = "ssh"
+    user        = local.vm_user
+    private_key = file(local.ssh_private_key)
+    host        = "${module.loadbalancers[count.index].instance_external_ip_address}"
+  }
+
+  # Note that the -i flag expects a comma separated list, so the trailing comma is essential!
+
+  provisioner "local-exec" {
+    command = "ansible-playbook -u '${local.vm_user}' --private-key '${local.ssh_private_key}' --become -i '${module.loadbalancers[count.index].instance_external_ip_address},loadbalancers' provision.yml"
+    #command = "ansible-playbook provision.yml -u '${local.vm_user}' --private-key '${local.ssh_private_key}' --become -i '${element(module.loadbalancers.nat_ip_address, 0)},' "
+  }
+
 }

@@ -23,12 +23,13 @@ variable "subnet_id" {
   description = "subnet id"
 }
 
-
 variable "subnet_cidrs" {
   type = list(string)
   description = "CIDRs"
 }
-
+/*
+variable "subnet_cidrs" {}
+*/
 ## VM parameters
 variable "vm_name" {
   description = "VM name"
@@ -106,5 +107,11 @@ variable "vm_user" {
 variable "ssh_public_key" {
   type        = string
   description = "cloud-config ssh public key"
+  default = ""
+}
+
+variable "ssh_private_key" {
+  type        = string
+  description = "cloud-config ssh private key"
   default = ""
 }

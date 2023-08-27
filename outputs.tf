@@ -1,11 +1,19 @@
-output "nginx_vm_name" {
-  value = module.nginxs[*].vm_name
+output "loadbalancers_info" {
+  description = "General information about created VMs"
+  value = [
+    for vm in module.loadbalancers : {
+      name = vm.vm_name
+      nat_ip_address = vm.instance_external_ip_address
+    }
+  ]
 }
 
-output "backend_vm_name" {
-  value = module.backends[*].vm_name
-}
-
-output "data_addr" {
-  value = data.yandex_vpc_address.addr.external_ipv4_address
+output "backends_info" {
+  description = "General information about created VMs"
+  value = [
+    for vm in module.backends : {
+      name = vm.vm_name
+      nat_ip_address = vm.instance_external_ip_address
+    }
+  ]
 }
