@@ -1,11 +1,15 @@
 ---
 - name: Install Nginx
   hosts: all
-  remote_user: debian
-  become: true
+  #remote_user: debian
+  #become: true
   serial: 5
 
   roles:
-    - chrony
-    - nftables
-    - nginx
+    - { role: loadbalancers, when: "'loadbalancers' in group_names" }
+    - { role: backends, when: "'backends' in group_names" }
+    #- { role: databases, when: "'databases' in group_names" }
+    #- chrony
+    #- nftables
+    #- nginx
+

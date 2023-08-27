@@ -4,6 +4,7 @@ output "loadbalancers_info" {
     for vm in module.loadbalancers : {
       name = vm.vm_name
       nat_ip_address = vm.instance_external_ip_address
+      ip_address = vm.instance_internal_ip_address
     }
   ]
 }
@@ -14,6 +15,7 @@ output "backends_info" {
     for vm in module.backends : {
       name = vm.vm_name
       nat_ip_address = vm.instance_external_ip_address
+      ip_address = vm.instance_internal_ip_address
     }
   ]
 }
