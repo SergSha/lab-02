@@ -3,7 +3,7 @@
 upstream backend {
         server {{ ip_address['backend-1'] }}:9000 weight=2;
         server {{ ip_address['backend-2'] }}:9000;
-        server {{ ip_address['backend-3'] }}:9000 backup;
+        server {{ ip_address['backend-3'] }}:9000;
 }
 
 server {

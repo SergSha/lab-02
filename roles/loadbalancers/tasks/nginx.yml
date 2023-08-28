@@ -28,7 +28,7 @@
 - name: Redhat OS
   block:
 
-  # dnf install chrony -y
+  # dnf install nginx -y
   - name: Ensure Nginx is at the latest version
     ansible.builtin.yum:
       name:
