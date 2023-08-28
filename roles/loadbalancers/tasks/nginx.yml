@@ -10,19 +10,6 @@
       state: latest
       update_cache: yes
   
-  # copy ./conf.d/upstream.conf.j2 /etc/nginx/conf.d/upstream.conf
-  - name: Template nginx config file
-    template:
-      src: nginx/conf.d/upstream.conf.j2
-      dest: /etc/nginx/conf.d/upstream.conf
-
-  # systemctl enable nginx --now
-  - name: Start Nginx Service
-    ansible.builtin.systemd:
-      name: nginx
-      state: started
-      enabled: yes
-
   when: ansible_os_family == "Debian"
 
 - name: Redhat OS
@@ -36,17 +23,17 @@
       state: latest
       enabled: yes
   
-  # copy ./conf.d/upstream.conf.j2 /etc/nginx/conf.d/upstream.conf
-  - name: Template nginx config file
-    template:
-      src: nginx/conf.d/upstream.conf.j2
-      dest: /etc/nginx/conf.d/upstream.conf
-
-  # systemctl enable nginx --now
-  - name: Start Nginx Service
-    ansible.builtin.systemd:
-      name: nginx
-      state: started
-      enabled: yes
-
   when: ansible_os_family == "RedHat"
+  
+# copy ./conf.d/upstream.conf.j2 /etc/nginx/conf.d/upstream.conf
+- name: Template nginx config file
+  template:
+    src: nginx/conf.d/upstream.conf.j2
+    dest: /etc/nginx/conf.d/upstream.conf
+
+# systemctl enable nginx --now
+- name: Start Nginx Service
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: yes
