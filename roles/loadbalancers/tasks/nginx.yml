@@ -28,8 +28,8 @@
 # copy ./conf.d/upstream.conf.j2 /etc/nginx/conf.d/upstream.conf
 - name: Template nginx config file
   template:
-    src: nginx/conf.d/upstream.conf.j2
-    dest: /etc/nginx/conf.d/upstream.conf
+    src: nginx/conf.d/upstreams.conf.j2
+    dest: /etc/nginx/conf.d/upstreams.conf
 
 # systemctl enable nginx --now
 - name: Start Nginx Service
