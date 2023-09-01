@@ -3,7 +3,7 @@
   block:
 
   # apt install chrony -y
-  - name: Installing Chrony
+  - name: Installing Chrony Debian
     ansible.builtin.apt:
       name:
         - chrony
@@ -11,7 +11,7 @@
       update_cache: yes
 
   # systemctl enable chrony --now
-  - name: Start Chrony Service
+  - name: Start Chrony Service Debian
     ansible.builtin.systemd:
       name: chrony
       state: started
@@ -29,14 +29,14 @@
   block:
 
   # dnf install chrony -y
-  - name: Installing Chrony
+  - name: Installing Chrony RedHat
     ansible.builtin.dnf:
       name:
         - chrony
       state: present
 
   # systemctl enable chronyd --now
-  - name: Start Chronyd Service
+  - name: Start Chronyd Service RedHat
     ansible.builtin.systemd:
       name: chronyd
       state: started

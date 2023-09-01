@@ -1,7 +1,0 @@
----
-# systemctl enable php-fpm --now
-- name: Start Nginx Service
-  ansible.builtin.systemd:
-    name: php-fpm
-    state: restarted
-    enabled: yes

@@ -16,6 +16,6 @@
 # systemctl enable php-fpm --now
 - name: Start php-fpm service
   ansible.builtin.systemd:
-    name: php-fpm
+    name: "php{{ php_version }}-fpm"
     state: restarted
     enabled: yes

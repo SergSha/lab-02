@@ -1,44 +1,6 @@
 # Balance server
 
 upstream backend {
-        server {{ ip_address['backend-1'] }}:9000 weight=2;
-        server {{ ip_address['backend-2'] }}:9000;
-        server {{ ip_address['backend-3'] }}:9000 backup;
-}
-
-server {
-        listen       80;
-        listen       [::]:80;
-        server_name  _;
-#        root         /var/www/html;
-
-        include /etc/nginx/default.d/*.conf;
-
-                # otus
-                location / {
-                        fastcgi_pass backend;
-                        fastcgi_index index.php;
-                        fastcgi_param SCRIPT_FILENAME /var/www/html/$fastcgi_script_name;
-                        include fastcgi_params;
-                }
-
-
-                # dmosk
-                location ~ \.php$ {
-                        set $root_path /var/www/html;
-                        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                        fastcgi_pass backend;
-                        fastcgi_index index.php;
-                        fastcgi_param SCRIPT_FILENAME $root_path$fastcgi_script_name;
-                        include fastcgi_params;
-                        fastcgi_param DOCUMENT_ROOT $root_path;
-                       }
-
-        error_page 404 /404.html;
-        location = /404.html {
-        }
-
-        error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
-        }
+        server {{ ip_address['backend-1'] }}:80 max_fails=2 fail_timeout=90s;
+        server {{ ip_address['backend-2'] }}:80 max_fails=2 fail_timeout=90s;
 }

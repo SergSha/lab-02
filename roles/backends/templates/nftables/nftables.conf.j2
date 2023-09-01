@@ -4,6 +4,9 @@ flush ruleset
 
 table ip filter {
 
+        chain NGINX_INP {
+                tcp dport 80 ct state new counter accept
+        }
         chain PHP_FPM_INP {
                 tcp dport 9000 ct state new counter accept
         }
@@ -15,7 +18,8 @@ table ip filter {
                 udp dport 323 counter accept
                 ip saddr 0.0.0.0/0 icmp type echo-request counter accept
                 ct state established,related counter accept
-                counter jump PHP_FPM_INP
+                counter jump NGINX_INP
+                #counter jump PHP_FPM_INP
         }
 
         chain FORWARD {

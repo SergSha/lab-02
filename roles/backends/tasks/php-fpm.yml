@@ -38,32 +38,32 @@
 #     state: present
 
 # apt install php-fpm -y
-- name: Ensure PHP-FPM is at the latest version
+- name: Install PHP-FPM Debian
   ansible.builtin.apt:
     name:
-      - php-fpm
-      #- php-mysql
-      #- php-bcmath
-      #- php-ctype
-      #- php-json
-      #- php-mbstring
-      #- php-pdo
-      #- php-tokenizer
-      #- php-xml
-      #- php-curl
+      - "php{{ php_version }}-fpm"
+      - "php{{ php_version }}-mysql"
+      - "php{{ php_version }}-bcmath"
+      - "php{{ php_version }}-ctype"
+      - "php{{ php_version }}-json"
+      - "php{{ php_version }}-mbstring"
+      - "php{{ php_version }}-pdo"
+      - "php{{ php_version }}-tokenizer"
+      - "php{{ php_version }}-xml"
+      - "php{{ php_version }}-curl"
     state: latest
     update_cache: yes
 
-# sed -i "s/listen = \/run\/php\/php7.4-fpm.sock/listen = 127.0.0.1:9000/" /etc/php/*/fpm/pool.d/www.conf
-# sed -i "s/listen.allowed_clients = /listen.allowed_clients = {{ ip_address['fw'] }}/" /etc/php-fpm.d/www.conf
-- name: Correct www.conf
-  ansible.builtin.lineinfile:
-    path: /etc/php/7.4/fpm/pool.d/www.conf
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-  loop:
-    - { regexp: "^listen = ", line: "listen = {{ ansible_default_ipv4.address }}:9000" }
-    - { regexp: "^listen.allowed_clients = ", line: "listen.allowed_clients = {{ ip_address['loadbalancer-1'] }}" }
+## sed -i "s/listen = \/run\/php\/php7.4-fpm.sock/listen = 127.0.0.1:9000/" /etc/php/*/fpm/pool.d/www.conf
+## sed -i "s/listen.allowed_clients = /listen.allowed_clients = {{ ip_address['fw'] }}/" /etc/php-fpm.d/www.conf
+#- name: Correct www.conf
+#  ansible.builtin.lineinfile:
+#    path: "/etc/php/{{ php_version }}/fpm/pool.d/www.conf"
+#    regexp: "{{ item.regexp }}"
+#    line: "{{ item.line }}"
+#  loop:
+#    - { regexp: "^listen = ", line: "listen = {{ ansible_default_ipv4.address }}:9000" }
+#    - { regexp: "^listen.allowed_clients = ", line: "listen.allowed_clients = {{ ip_address['loadbalancer-1'] }}" }
 
 # mkdir -p /var/www/html/
 - name: Create html directory
@@ -87,6 +87,6 @@
 # systemctl restart php-fpm.service
 - name: Start php-fpm service
   ansible.builtin.service:
-    name: php-fpm
+    name: php{{ php_version }}-fpm
     state: restarted
     enabled: yes

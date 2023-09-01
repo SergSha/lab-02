@@ -39,9 +39,23 @@ module "loadbalancers" {
 module "backends" {
   source = "./modules/instances"
 
-  count = 3
+  count = 2
 
   vm_name = "backend-${count.index + 1}"
+  vpc_name = local.vpc_name
+  subnet_cidrs = yandex_vpc_subnet.subnet.v4_cidr_blocks
+  subnet_name = yandex_vpc_subnet.subnet.name
+  subnet_id = yandex_vpc_subnet.subnet.id
+  vm_user = local.vm_user
+  ssh_public_key = local.ssh_public_key
+}
+
+module "databases" {
+  source = "./modules/instances"
+
+  count = 1
+
+  vm_name = "database-${count.index + 1}"
   vpc_name = local.vpc_name
   subnet_cidrs = yandex_vpc_subnet.subnet.v4_cidr_blocks
   subnet_name = yandex_vpc_subnet.subnet.name
@@ -55,6 +69,7 @@ resource "local_file" "inventory_file" {
     {
       loadbalancers = module.loadbalancers
       backends      = module.backends
+      databases     = module.databases
     }
   )
   filename = "${path.module}/inventory.ini"
@@ -65,6 +80,7 @@ resource "local_file" "group_vars_all_file" {
     {
       loadbalancers = module.loadbalancers
       backends      = module.backends
+      databases     = module.databases
     }
   )
   filename = "${path.module}/group_vars/all/main.yml"
@@ -129,6 +145,38 @@ resource "null_resource" "backends" {
 
   provisioner "local-exec" {
     command = "ansible-playbook -u '${local.vm_user}' --private-key '${local.ssh_private_key}' --become -i '${module.backends[count.index].instance_external_ip_address},' provision.yml"
+    #command = "ansible-playbook provision.yml -u '${local.vm_user}' --private-key '${local.ssh_private_key}' --become -i '${element(module.loadbalancers.nat_ip_address, 0)},' "
+  }
+}
+*/
+/*
+resource "null_resource" "databases" {
+
+  count = length(module.databases)
+
+  # Changes to the instance will cause the null_resource to be re-executed
+  triggers = {
+    name = "${module.databases[count.index].vm_name}"
+  }
+
+  # Running the remote provisioner like this ensures that ssh is up and running
+  # before running the local provisioner
+
+  provisioner "remote-exec" {
+    inline = ["echo 'Wait until SSH is ready'"]
+  }
+
+  connection {
+    type        = "ssh"
+    user        = local.vm_user
+    private_key = file(local.ssh_private_key)
+    host        = "${module.databases[count.index].instance_external_ip_address}"
+  }
+
+  # Note that the -i flag expects a comma separated list, so the trailing comma is essential!
+
+  provisioner "local-exec" {
+    command = "ansible-playbook -u '${local.vm_user}' --private-key '${local.ssh_private_key}' --become -i '${module.databases[count.index].instance_external_ip_address},' provision.yml"
     #command = "ansible-playbook provision.yml -u '${local.vm_user}' --private-key '${local.ssh_private_key}' --become -i '${element(module.loadbalancers.nat_ip_address, 0)},' "
   }
 }
