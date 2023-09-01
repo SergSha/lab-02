@@ -72,9 +72,6 @@ upstream backend {
 ```
 terraform apply -auto-approve
 ```
-
-<details>
-<summary>Click to expand</summary>
 ```
 (.venv) [user@centos7 lab-02]$ terraform apply -auto-approve
 Terraform used the selected providers to generate the following execution plan.
@@ -471,7 +468,6 @@ loadbalancers_info = [
   },
 ]
 ```
-</details>
 
 Получим запущенные виртуальные машины:
 
