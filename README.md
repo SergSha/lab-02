@@ -72,6 +72,9 @@ upstream backend {
 ```
 terraform apply -auto-approve
 ```
+
+<details>
+<summary>Click to expand</summary>
 ```
 (.venv) [user@centos7 lab-02]$ terraform apply -auto-approve
 Terraform used the selected providers to generate the following execution plan.
@@ -468,6 +471,8 @@ loadbalancers_info = [
   },
 ]
 ```
+</details>
+
 Получим запущенные виртуальные машины:
 
 <img src="pics/screen-001.png" alt="screen-001.png" />
@@ -475,7 +480,7 @@ loadbalancers_info = [
 После запуска предыдущей команды terraform автоматически сгенерировал inventory файл, 
 который понадобится для последующего запуска команды ansible:
 ```
-ls -l ./inventory.ini
+cat ./inventory.ini
 ```
 ```
 [all]
@@ -902,3 +907,25 @@ root@database-1:~#
 
 Убеждаемся, что балансировщик loadbalancer-1 корректно выполняет свою функцию при отключении одного из backend-серверов.
 
+### Запуск стенда
+
+Для того чтобы скачать, развернуть и запустить стенд, нужно выполнить следующую команду:
+```
+git clone https://github.com/SergSha/lab-02.git && \
+cd ./lab-02/ && \
+terraform init && \
+terraform apply -auto-approve
+```
+После того как инфраструктура развернётся, запустить следующую команду:
+```
+ansible-playbook -u debian --private-key ~/.ssh/otus -b ./provision.yml
+```
+В созданном файле inventory.ini скопировать значение nat_ip_address сервера loadbalancer-1 
+и вставить в адресную строку браузера.
+
+### Удаление стенда
+
+Удалить развернутый стенд командой:
+```
+terraform destroy -auto-approve
+```
